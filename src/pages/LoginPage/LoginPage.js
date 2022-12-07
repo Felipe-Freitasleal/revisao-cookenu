@@ -4,21 +4,29 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Checkbox,
     Stack,
-    Link,
     Button,
     Heading,
     Text,
     useColorModeValue,
-} from '@chakra-ui/react';
-import { useState } from 'react';
+    Spinner,
+    Link
+} from '@chakra-ui/react'
+import { useState } from 'react'
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
+import { BASE_URL } from '../../constants/url'
+import { goToHomePage, goToSignupPage } from '../../routes/coordinator'
 
 const LoginPage = () => {
     // const [ email, setEmail ] = useState("")
     // const [ password, setPassword ] = useState("")
 
-    const [ form, setForm ] = useState({
+    const navigate = useNavigate()
+
+    const [isLoading, setIsLoading] = useState(false)
+
+    const [form, setForm] = useState({
         email: "",
         password: ""
     })
@@ -32,11 +40,31 @@ const LoginPage = () => {
     // }
 
     const onChangeForm = (event) => {
-        setForm({...form, [event.target.name]: event.target.value})
+        setForm({ ...form, [event.target.name]: event.target.value })
     }
 
-    const login = () => {
-        console.log(form)
+    const login = async () => {
+        try {
+            setIsLoading(true)
+
+            const body = {
+                email: form.email,
+                password: form.password
+            }
+
+            const response = await axios.post(
+                `${BASE_URL}/user/login`,
+                body
+            )
+
+            window.localStorage.setItem("cookenu-token", response.data.token)
+            setIsLoading(false)
+
+            goToHomePage(navigate)
+        } catch (error) {
+            console.log(error)
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -47,9 +75,9 @@ const LoginPage = () => {
             bg={useColorModeValue('gray.50', 'gray.800')}>
             <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
                 <Stack align={'center'}>
-                    <Heading fontSize={'4xl'}>Sign in to your account</Heading>
+                    <Heading fontSize={'4xl'}>Entre em sua conta</Heading>
                     <Text fontSize={'lg'} color={'gray.600'}>
-                        to enjoy all of our cool <Link color={'blue.400'}>features</Link> ✌️
+                        para aproveitar as melhores receitas Cookenu ✌️
                     </Text>
                 </Stack>
                 <Box
@@ -59,21 +87,25 @@ const LoginPage = () => {
                     p={8}>
                     <Stack spacing={4}>
                         <FormControl id="email">
-                            <FormLabel>Email address</FormLabel>
-                            <Input type="email" value={form.email} onChange={onChangeForm} name="email" />
+                            <FormLabel>Email</FormLabel>
+                            <Input
+                                type="email"
+                                value={form.email}
+                                onChange={onChangeForm}
+                                name="email"
+                                autoComplete='off'
+                            />
                         </FormControl>
                         <FormControl id="password">
-                            <FormLabel>Password</FormLabel>
-                            <Input type="password" value={form.password} onChange={onChangeForm} name="password" />
+                            <FormLabel>Senha</FormLabel>
+                            <Input
+                                type="password"
+                                value={form.password}
+                                onChange={onChangeForm}
+                                name="password"
+                            />
                         </FormControl>
                         <Stack spacing={10}>
-                            <Stack
-                                direction={{ base: 'column', sm: 'row' }}
-                                align={'start'}
-                                justify={'space-between'}>
-                                <Checkbox>Remember me</Checkbox>
-                                <Link color={'blue.400'}>Forgot password?</Link>
-                            </Stack>
                             <Button
                                 bg={'blue.400'}
                                 color={'white'}
@@ -81,15 +113,24 @@ const LoginPage = () => {
                                     bg: 'blue.500',
                                 }}
                                 onClick={login}
-                                >
-                                Sign in
+                            >
+                                {isLoading ? <Spinner /> : "Entrar"}
                             </Button>
+                        </Stack>
+
+                        <Stack paddingTop={5} paddingBottom={5}>
+                            <Text textAlign={"center"}>
+                                Ainda não tem conta? {" "}
+                                <Link color="blue" onClick={() => goToSignupPage(navigate)}>
+                                    Cadastre-se!
+                                </Link>
+                            </Text>
                         </Stack>
                     </Stack>
                 </Box>
             </Stack>
         </Flex>
-    );
+    )
 }
 
 export default LoginPage
