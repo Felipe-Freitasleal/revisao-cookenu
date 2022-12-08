@@ -31,8 +31,6 @@ const HomePage = () => {
         fetchRecipes()
     }, [])
 
-    console.log(recipes)
-
     const fetchRecipes = async () => {
         try {
             const config = {
