@@ -33,14 +33,11 @@ const LoginPage = () => {
         password: ""
     })
 
-    console.log(context.isAuth)
-
     useEffect(() => {
         if (context.isAuth) {
             goToHomePage(navigate)
         }
     })
-
 
     // const onChangeEmail = (event) => {
     //     setEmail(event.target.value)
