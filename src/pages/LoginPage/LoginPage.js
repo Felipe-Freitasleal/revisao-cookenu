@@ -12,16 +12,18 @@ import {
     Spinner,
     Link
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { BASE_URL } from '../../constants/url'
 import { goToHomePage, goToSignupPage } from '../../routes/coordinator'
+import { GlobalContext } from '../../contexts/GlobalContext'
 
 const LoginPage = () => {
     // const [ email, setEmail ] = useState("")
     // const [ password, setPassword ] = useState("")
 
+    const context = useContext(GlobalContext)
     const navigate = useNavigate()
 
     const [isLoading, setIsLoading] = useState(false)
@@ -30,6 +32,15 @@ const LoginPage = () => {
         email: "",
         password: ""
     })
+
+    console.log(context.isAuth)
+
+    useEffect(() => {
+        if (context.isAuth) {
+            goToHomePage(navigate)
+        }
+    })
+
 
     // const onChangeEmail = (event) => {
     //     setEmail(event.target.value)
@@ -59,6 +70,7 @@ const LoginPage = () => {
 
             window.localStorage.setItem("cookenu-token", response.data.token)
             setIsLoading(false)
+            context.setIsAuth(true)
 
             goToHomePage(navigate)
         } catch (error) {
@@ -66,6 +78,30 @@ const LoginPage = () => {
             setIsLoading(false)
         }
     }
+
+    // const loginThenCatch = () => {
+    //         setIsLoading(true)
+
+    //         const body = {
+    //             email: form.email,
+    //             password: form.password
+    //         }
+
+    //         axios.post(
+    //             `${BASE_URL}/user/login`,
+    //             body
+    //         )
+    //         .then((response) => {
+    //             window.localStorage.setItem("cookenu-token", response.data.token)
+    //             setIsLoading(false)
+    
+    //             goToHomePage(navigate)
+    //         })
+    //         .catch((error) => {
+    //             console.log(error)
+    //             setIsLoading(false)
+    //         })
+    // }
 
     return (
         <Flex
